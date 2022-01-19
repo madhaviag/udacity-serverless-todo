@@ -3,17 +3,20 @@ import 'source-map-support/register'
 import * as uuid from 'uuid'
 
 import { TodosAccess } from '../dataLayer/TodosAccess'
-import { TodosStorage } from '../dataLayer/TodosStorage'
+//import { TodosStorage } from '../dataLayer/TodosStorage'
 import { TodoItem } from '../models/TodoItem'
-import { TodoUpdate } from '../models/TodoUpdate'
+//import { TodoUpdate } from '../models/TodoUpdate'
+//import { parseUserId } from '../auth/utils'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
+//import { APIGatewayProxyEvent } from 'aws-lambda';
+
 
 const logger = createLogger('todos')
 
 const todosAccess = new TodosAccess()
-const todosStorage = new TodosStorage()
+
 
 export async function getTodos(userId: string): Promise<TodoItem[]> {
   logger.info(`Retrieving all todos for user ${userId}`, { userId })
@@ -40,62 +43,20 @@ export async function createTodo(userId: string, createTodoRequest: CreateTodoRe
   return newItem
 }
 
-export async function updateTodo(userId: string, todoId: string, updateTodoRequest: UpdateTodoRequest) {
-  logger.info(`Updating todo ${todoId} for user ${userId}`, { userId, todoId, todoUpdate: updateTodoRequest })
-
-  const item = await todosAccess.getTodoItem(todoId)
-
-  if (!item)
-    throw new Error('Item not found')  // FIXME: 404?
-
-  if (item.userId !== userId) {
-    logger.error(`User ${userId} does not have permission to update todo ${todoId}`)
-    throw new Error('User is not authorized to update item')  // FIXME: 403?
-  }
-
-  todosAccess.updateTodoItem(todoId, updateTodoRequest as TodoUpdate)
+export async function updateTodo(
+  userId: string,
+  todoId: string,
+  updatedTodo: UpdateTodoRequest
+): Promise<Boolean> {
+  return todosAccess.updateTodo(userId, todoId, updatedTodo)
 }
 
-export async function deleteTodo(userId: string, todoId: string) {
-  logger.info(`Deleting todo ${todoId} for user ${userId}`, { userId, todoId })
+export async function deleteTodo(userId: string, todoId: string): Promise<Boolean> {
+  logger.info(`Deleting todo ${todoId} for user `, { todoId })
 
-  const item = await todosAccess.getTodoItem(todoId)
-
-  if (!item)
-    throw new Error('Item not found')  // FIXME: 404?
-
-  if (item.userId !== userId) {
-    logger.error(`User ${userId} does not have permission to delete todo ${todoId}`)
-    throw new Error('User is not authorized to delete item')  // FIXME: 403?
-  }
-
-  todosAccess.deleteTodoItem(todoId)
+  return todosAccess.deleteTodo(userId, todoId)
 }
 
-export async function updateAttachmentUrl(userId: string, todoId: string, attachmentId: string) {
-  logger.info(`Generating attachment URL for attachment ${attachmentId}`)
-
-  const attachmentUrl = await todosStorage.getAttachmentUrl(attachmentId)
-
-  logger.info(`Updating todo ${todoId} with attachment URL ${attachmentUrl}`, { userId, todoId })
-
-  const item = await todosAccess.getTodoItem(todoId)
-
-  if (!item)
-    throw new Error('Item not found')  // FIXME: 404?
-
-  if (item.userId !== userId) {
-    logger.error(`User ${userId} does not have permission to update todo ${todoId}`)
-    throw new Error('User is not authorized to update item')  // FIXME: 403?
-  }
-
-  await todosAccess.updateAttachmentUrl(todoId, attachmentUrl)
-}
-
-export async function generateUploadUrl(attachmentId: string): Promise<string> {
-  logger.info(`Generating upload URL for attachment ${attachmentId}`)
-
-  const uploadUrl = await todosStorage.getUploadUrl(attachmentId)
-
-  return uploadUrl
+export async function generateUploadUrl(todoId: string, userId: string): Promise<string> {
+  return await todosAccess.generateUploadUrl(todoId, userId)
 }
