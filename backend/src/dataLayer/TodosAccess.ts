@@ -17,9 +17,11 @@ export class TodosAccess {
 
   constructor(
     private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
+    private readonly S3 = new XAWS.S3({signatureVersion: 'v4'}),
     private readonly todosTable = process.env.TODOS_TABLE,
-    private readonly todosByUserIndex = process.env.TODOS_BY_USER_INDEX
-  ) {}
+    private readonly todosByUserIndex = process.env.TODOS_BY_USER_INDEX,
+    private readonly bucket = process.env.ATTACHMENT_S3_BUCKET
+  ) { }
 
   async todoItemExists(todoId: string): Promise<boolean> {
     const item = await this.getTodoItem(todoId)
@@ -69,50 +71,85 @@ export class TodosAccess {
     }).promise()
   }
 
-  async updateTodoItem(todoId: string, todoUpdate: TodoUpdate) {
+
+  async updateTodo(userId: string, todoId: string, todoUpdate: TodoUpdate): Promise<Boolean> {
+    let isSuccess = false
     logger.info(`Updating todo item ${todoId} in ${this.todosTable}`)
+    try {
+      await this.docClient.update({
+        TableName: this.todosTable,
+        Key: {
+          userId,
+          todoId
+        },
+        UpdateExpression: 'set #name = :name, #dueDate = :dueDate, #done = :done',
+        ExpressionAttributeNames: {
+          "#name": "name",
+          "#dueDate": "dueDate",
+          "#done": "done"
 
-    await this.docClient.update({
-      TableName: this.todosTable,
-      Key: {
-        todoId
-      },
-      UpdateExpression: 'set #name = :name, dueDate = :dueDate, done = :done',
-      ExpressionAttributeNames: {
-        "#name": "name"
-      },
-      ExpressionAttributeValues: {
-        ":name": todoUpdate.name,
-        ":dueDate": todoUpdate.dueDate,
-        ":done": todoUpdate.done
-      }
-    }).promise()   
+        },
+        ExpressionAttributeValues: {
+          ":name": todoUpdate.name,
+          ":dueDate": todoUpdate.dueDate,
+          ":done": todoUpdate.done
+        }
+      }).promise()
+      isSuccess = true
+    } catch (e) {
+      logger.error('Error occurred while updating Todo.', {
+        error: e,
+        data: {
+          userId,
+          todoId,
+          todoUpdate
+        }
+      })
+    }
+    return isSuccess
+
   }
 
-  async deleteTodoItem(todoId: string) {
+  async deleteTodo(userId: string, todoId: string): Promise<Boolean> {
+    let success = false
     logger.info(`Deleting todo item ${todoId} from ${this.todosTable}`)
+    try {
+      await this.docClient.delete({
+        TableName: this.todosTable,
+        Key: {
+          userId,
+          todoId
+        }
+      }).promise()
+      success = true
+    } catch (e) {
+      logger.info('Error occurred while deleting Todo from database', { error: e })
 
-    await this.docClient.delete({
-      TableName: this.todosTable,
-      Key: {
-        todoId
-      }
-    }).promise()    
+    }
+    return success
   }
 
-  async updateAttachmentUrl(todoId: string, attachmentUrl: string) {
-    logger.info(`Updating attachment URL for todo ${todoId} in ${this.todosTable}`)
-
+  async generateUploadUrl(todoId: string, userId: string): Promise<string> {
+    //let attachmentUrl: string = 'https://' + process.env.S3_BUCKET + '.s3.amazonaws.com/' + todoId
+    //logger.info(attachmentUrl);
+    const uploadUrl = this.S3.getSignedUrl("putObject", {
+      Bucket: this.bucket,
+      Key: todoId,
+      Expires: 300
+  });
     await this.docClient.update({
       TableName: this.todosTable,
       Key: {
+        userId,
         todoId
       },
-      UpdateExpression: 'set attachmentUrl = :attachmentUrl',
+      UpdateExpression: 'set attachmentUrl = :URL',
       ExpressionAttributeValues: {
-        ':attachmentUrl': attachmentUrl
-      }
+        ":URL": uploadUrl.split("?")[0]
+      },
+      ReturnValues: "UPDATED_NEW"
     }).promise()
+    return uploadUrl;
   }
 
 }

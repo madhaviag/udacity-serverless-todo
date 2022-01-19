@@ -1,33 +1,46 @@
 import 'source-map-support/register'
 
-import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
-import * as uuid from 'uuid'
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { generateUploadUrl, updateAttachmentUrl } from '../../businessLogic/todos'
 import { createLogger } from '../../utils/logger'
+import { generateUploadUrl } from '../../businessLogic/todos'
 import { getUserId } from '../utils'
 
 const logger = createLogger('generateUploadUrl')
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  logger.info('Processing generateUploadUrl event', { event })
+export const handler = middy(
+  async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    const todoId = event.pathParameters.todoId
+    const userId: string = getUserId(event)
 
-  const userId = getUserId(event)
-  const todoId = event.pathParameters.todoId
-  const attachmentId = uuid.v4()
+    // check for missing todo id
+    if (!todoId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({error: 'todoId was not provided'})
+      }
+    }
 
-  const uploadUrl = await generateUploadUrl(attachmentId)
+    const signedUrl = await generateUploadUrl(todoId, userId)
 
-  await updateAttachmentUrl(userId, todoId, attachmentId)
-
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true  
-    },
-    body: JSON.stringify({
-      uploadUrl
+    logger.info(`Generated signed url for a TODO`, {
+      url: signedUrl,
+      todoId: todoId
     })
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        uploadUrl: signedUrl
+      })
+    }
   }
-}
+)
+
+handler.use(
+  cors({
+    credentials: true
+  })
+)

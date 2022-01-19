@@ -15,8 +15,15 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const userId = getUserId(event)
   const todoId = event.pathParameters.todoId
   const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
+  //const updatedToDo = await updateTodo(userId, todoID,updatedTodo );
 
-  await updateTodo(userId, todoId, updatedTodo)
+  const success = await updateTodo(userId, todoId, updatedTodo)
+  if(!success){
+    return{
+      statusCode: 500,
+      body: "Error occured while updating Todo."
+    }
+  }
 
   return {
     statusCode: 200,
@@ -24,6 +31,6 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true  
     },
-    body: ''
+    body: JSON.stringify({ msg: "T0-do has been updated", updated: updatedTodo })
   }
 }

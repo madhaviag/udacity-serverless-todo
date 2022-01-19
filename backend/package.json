@@ -16,10 +16,10 @@
     "winston": "^3.4.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.89",
-    "@types/jsonwebtoken": "^8.5.7",
+    "@types/aws-lambda": "^8.10.90",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^10.17.60",
-    "aws-sdk": "^2.1057.0",
+    "aws-sdk": "^2.433.0",
     "serverless-aws-documentation": "^1.1.0",
     "serverless-iam-roles-per-function": "^3.2.0",
     "serverless-plugin-canary-deployments": "^0.4.8",
@@ -27,7 +27,7 @@
     "serverless-webpack": "^5.6.0",
     "ts-loader": "^5.4.5",
     "typescript": "^3.9.10",
-    "webpack": "^4.46.0"
+    "webpack": "^5.66.0"
   },
   "author": "Ivan Mushketyk",
   "license": "MIT"
