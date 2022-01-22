@@ -15,6 +15,7 @@ export const handler = middy(
     const todoId = event.pathParameters.todoId
     const userId: string = getUserId(event)
 
+    logger.info( `INSIDE generateUploadUrl`);
     // check for missing todo id
     if (!todoId) {
       return {
@@ -31,7 +32,7 @@ export const handler = middy(
     })
 
     return {
-      statusCode: 200,
+      statusCode: 201,
       body: JSON.stringify({
         uploadUrl: signedUrl
       })
