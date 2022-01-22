@@ -4,7 +4,7 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
-  - serverless-reqvalidator-plugin
+  
 
 provider:
   name: aws
@@ -24,20 +24,6 @@ provider:
     lambda: true
     apiGateway: true
 
-custom:
-  documentation:
-    api:
-      info:
-        version: v1.0.0
-        title: Udacity ToDo API
-        description: Serverless application for managing user Todos
-    models:
-      - name: CreateTodoRequest
-        contentType: application/json
-        schema: ${file(models/create-todo-request.json)}
-      - name: UpdateTodoRequest
-        contentType: application/json
-        schema: ${file(models/update-todo-request.json)}
 
 functions:
 
@@ -80,12 +66,9 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Create a new todo
-            description: Create a new todo
-            requestModels:
-              'application/json': CreateTodoRequest
+          request:
+            schema:
+              'application/json': ${file(models/create-todo-request.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -115,11 +98,9 @@ functions:
           cors: true
           authorizer: Auth
           reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Update a todo item
-            description: Update a todo item
-            requestModels:
-              'application/json': UpdateTodoRequest
+          request:
+            schema:
+              application/json: ${file(src/models/update-todo-request.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
