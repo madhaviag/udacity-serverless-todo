@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d0700d24-79ec-487e-8403-b565bef7f8e0",
+		"_postman_id": "008a91c3-2e75-4c93-a93f-fe1961b8494c",
 		"name": "Udacity C4 Project",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -19,10 +19,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos",
 							"protocol": "https",
@@ -60,7 +56,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Water flowers\",\n\t\"dueDate\": \"2019-06-11\"\n}"
+							"raw": "{\n\t\"name\": \"Water the plants\",\n\t\"dueDate\": \"2022-04-11\"\n   \n}"
 						},
 						"url": {
 							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos",
@@ -94,15 +90,20 @@
 							{
 								"key": "Authorization",
 								"type": "text",
-								"value": "Bearer {{}}"
+								"value": "Bearer {{authToken}}"
+							},
+							{
+								"key": "Access-Control-Allow-Origin",
+								"value": "*",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Change the world\",\n\t\"dueDate\": \"2019-12-11\",\n\t\"done\": true\n}"
+							"raw": "{\n\t\"name\": \"Water the plants daily111\",\n    \"dueDate\" :\"2022-04-11\",\n    \"done\" : true\n    \n}"
 						},
 						"url": {
-							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos/35dd600f-43c2-4649-903c-615e1586a26f",
+							"raw": "https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos/49c4a14a-7ab6-4baf-8c20-779214e78b9a",
 							"protocol": "https",
 							"host": [
 								"{{apiId}}",
@@ -114,7 +115,7 @@
 							"path": [
 								"dev",
 								"todos",
-								"35dd600f-43c2-4649-903c-615e1586a26f"
+								"49c4a14a-7ab6-4baf-8c20-779214e78b9a"
 							]
 						}
 					},
@@ -200,7 +201,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ce2b42d4-8cc5-4f30-a6ed-e7f0f303c3fd",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -210,7 +210,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "efb16c49-3866-4241-97d1-360ad72736d8",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -224,7 +223,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "2e83c0fe-6650-44d5-a90f-4c27ff720d83",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -234,7 +232,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "977c227e-2df3-42eb-9a48-ec25e2f7eeae",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -244,16 +241,12 @@
 	],
 	"variable": [
 		{
-			"id": "bf208e6b-f66d-4008-9366-dd541ff65425",
 			"key": "apiId",
-			"value": "",
-			"type": "string"
+			"value": "q2p7or6iek"
 		},
 		{
-			"id": "9bc6399a-d2bb-4f2d-9ffa-8480370d383c",
 			"key": "authToken",
-			"value": "",
-			"type": "string"
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkptNXJud01ZdTN5XzJnZURuSXNoRCJ9.eyJpc3MiOiJodHRwczovL2Rldi1icTM4OWU5ai51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjFlMGRkYTA2OTBjZDEwMDY4NmYyMzk5IiwiYXVkIjoiUEZaS2JiYXBPNGhCUkw0UEpRTTh6SENzZVY3TDFrS2kiLCJpYXQiOjE2NDIxMzQ3OTIsImV4cCI6MTY0MjE3MDc5MiwiYXRfaGFzaCI6IjI5dlJZcG1mSVRiV0RTTU9hNjlHd3ciLCJub25jZSI6IklNZVlESk9vd19RclJpZHFjanJ3NUd-VFoudm5ydTBMIn0.Txo2dDDeW4FV5l6ZWC4dOy9_zi76g0euBfZe31426q47yjGJESEVe-1Al4SOWsn4gfLeo_36xSpuvgCEhC6GPunwivPWJ_mrnEn4TnWwjyc3eOEqYy54sWyilgQL_vKKN1ELKeLhcmsH67LrPsdGHAaNDKsF5i7WZfLzh-D42DUv4yVcoVt_Eh3SXUtTqU81rrcGCYi9Qv19DhTMZyT1p4ulclAN1f2IvQvOvIheEXydHHSTUqwBfJeR3ud-kvVexsxNNFbqrfYC_nS4Dvd9-Ey_gS3LloG54EQ2NBBEn46-CqDg7SJZYnz51kOujpr2DBqYHZucXfBuOC7QqS1d6A"
 		}
 	]
 }

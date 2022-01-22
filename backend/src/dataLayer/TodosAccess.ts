@@ -20,7 +20,8 @@ export class TodosAccess {
     private readonly S3 = new XAWS.S3({signatureVersion: 'v4'}),
     private readonly todosTable = process.env.TODOS_TABLE,
     private readonly todosByUserIndex = process.env.TODOS_BY_USER_INDEX,
-    private readonly bucket = process.env.ATTACHMENT_S3_BUCKET
+    private readonly bucket = process.env.ATTACHMENTS_S3_BUCKET
+    
   ) { }
 
   async todoItemExists(todoId: string): Promise<boolean> {
@@ -130,8 +131,8 @@ export class TodosAccess {
   }
 
   async generateUploadUrl(todoId: string, userId: string): Promise<string> {
-    //let attachmentUrl: string = 'https://' + process.env.S3_BUCKET + '.s3.amazonaws.com/' + todoId
-    //logger.info(attachmentUrl);
+    let attachmentUrl: string = 'https://' + process.env.ATTACHMENTS_S3_BUCKET + '.s3.amazonaws.com/' + todoId
+    logger.info('INSIDE URL is:' , attachmentUrl);
     const uploadUrl = this.S3.getSignedUrl("putObject", {
       Bucket: this.bucket,
       Key: todoId,

@@ -58,5 +58,6 @@ export async function deleteTodo(userId: string, todoId: string): Promise<Boolea
 }
 
 export async function generateUploadUrl(todoId: string, userId: string): Promise<string> {
+  logger.info(`INSIDE todos.ts `)
   return await todosAccess.generateUploadUrl(todoId, userId)
 }

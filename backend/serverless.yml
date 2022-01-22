@@ -254,6 +254,6 @@ resources:
               Effect: Allow
               Principal: '*'
               Action: 
-                - "s3:GetObject"
-              Resource: 'arn:aws:s3:::${self:provider.environment.ATTACHMENTS_S3_BUCKET}/*'
+                - s3:GetObject
+              Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENTS_S3_BUCKET}/*
         Bucket: !Ref AttachmentsBucket
